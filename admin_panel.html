@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yusi Books Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Define custom color variables */
+        :root {
+            --primary-color: #0d7878;
+            --primary-dark: #065e5e;
+            --primary-light: #16a6a6;
+            --secondary-color: #2C3E50;
+            --accent-color: #08821c;
+            --success-color: #27AE60;
+            --warning-color: #F39C12;
+            --text-color: #f8f9fa;
+            --sidebar-width: 250px;
+            --transition-speed: 0.3s;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+        }
+
+        /* Main layout container */
+        .page-wrapper {
+            display: flex;
+            min-height: 100vh;
+            transition: margin-left var(--transition-speed) ease;
+        }
+
+        /* Sidebar styling */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--primary-dark);
+            color: var(--text-color);
+            flex-shrink: 0;
+            transition: transform var(--transition-speed) ease;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 1050; /* Above bootstrap navbar */
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .sidebar-header h3 {
+            font-weight: 700;
+            color: var(--text-color);
+            margin: 0;
+        }
+
+        .sidebar-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+            font-size: 1rem;
+        }
+
+        /* .sidebar-menu li a:hover{
+            background-color: var(--primary-light);
+            color: #fff;
+            /* Changed margin to add vertical spacing on hover/active 
+            margin-bottom: 10px;
+            
+        }*/
+        
+         .sidebar-menu li a.active {
+            background-color: var(--primary-light);
+            color: #fff;
+            margin-bottom: 10px;
+            
+        }
+
+
+        .sidebar-menu li a i {
+            margin-right: 15px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main content area styling */
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            margin-left: var(--sidebar-width); /* Default margin for desktop */
+            transition: margin-left var(--transition-speed) ease;
+        }
+
+        /* Mobile specific styles and toggle behavior */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .content {
+                margin-left: 0;
+            }
+            .page-wrapper.sidebar-active .content {
+                margin-left: var(--sidebar-width);
+            }
+            .navbar-brand {
+                display: none; /* Hide logo on mobile when sidebar is open */
+            }
+        }
+        
+        /* Backdrop when sidebar is open on mobile */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1040;
+        }
+        .overlay.active {
+            display: block;
+        }
+
+        /* Navbar styling */
+        .navbar {
+            background-color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-light);
+        }
+        .navbar-brand {
+            color: var(--text-color) !important;
+            font-weight: 700;
+        }
+        .navbar .btn-toggle {
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
+        }
+        .navbar .btn-toggle:focus {
+            box-shadow: none;
+        }
+        .form-control.search-input {
+            border-radius: 25px;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="page-wrapper">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>Yusi Books</h3>
+            </div>
+            <div class="sidebar-menu">
+                <ul>
+                    <li>
+                        <a href="#" class="active" data-page="Dashboard">
+                            <i class="fas fa-chart-line"></i> Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-page="User Management">
+                            <i class="fas fa-users"></i> User Management
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-page="Subscriptions">
+                            <i class="fas fa-credit-card"></i> Subscriptions
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-page="Payments">
+                            <i class="fas fa-wallet"></i> Payments
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-page="System">
+                            <i class="fas fa-server"></i> System
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-page="Marketing">
+                            <i class="fas fa-bullhorn"></i> Marketing
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-page="Reports">
+                            <i class="fas fa-file-alt"></i> Reports
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-page="Admin Roles">
+                            <i class="fas fa-user-shield"></i> Admin Roles
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-page="Support">
+                            <i class="fas fa-headset"></i> Support
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-page="Monitoring">
+                            <i class="fas fa-chart-bar"></i> Monitoring
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main Content Wrapper -->
+        <div class="content-wrapper w-100">
+            <!-- Top Navbar -->
+            <nav class="navbar navbar-expand-lg navbar-dark sticky-top shadow-sm">
+                <div class="container-fluid">
+                    <!-- Toggle Button (for mobile) -->
+                    <button class="btn btn-toggle d-lg-none" type="button" id="sidebar-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+
+                    <!-- Brand Logo -->
+                    <a class="navbar-brand d-none d-lg-block" href="#">Yusi Books</a>
+                    
+                    <!-- Search Bar and Profile -->
+                    <div class="d-flex align-items-center ms-auto">
+                        <form class="d-flex me-3">
+                            <input class="form-control search-input" type="search" placeholder="Search..." aria-label="Search">
+                        </form>
+                        <ul class="navbar-nav flex-row">
+                            <li class="nav-item me-2">
+                                <a class="nav-link" href="#"><i class="fas fa-bell text-white"></i></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#"><i class="fas fa-user-circle text-white"></i></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Main Content Area -->
+            <main id="main-content" class="content">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2" id="page-title">Dashboard</h1>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card p-4 shadow-sm rounded-lg" id="page-content">
+                            <h3>Welcome to Yusi Books!</h3>
+                            <p>This is the main content area for the Dashboard.</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Mobile overlay -->
+    <div class="overlay" id="sidebar-overlay"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            const pageWrapper = document.querySelector('.page-wrapper');
+            const mainContentArea = document.getElementById('main-content');
+            const pageTitle = document.getElementById('page-title');
+            const pageContent = document.getElementById('page-content');
+            const sidebarLinks = document.querySelectorAll('.sidebar-menu a');
+
+            // Define content for each page
+            const pages = {
+                'Dashboard': {
+                    title: 'Dashboard',
+                    content: `<h3>Welcome to Yusi Books!</h3>
+                              <p>This is the main content area for the Dashboard. Here you can see a quick overview of your system's performance.</p>`
+                },
+                'User Management': {
+                    title: 'User Management',
+                    content: `<h3>Manage Users</h3>
+                              <p>This section is for managing user accounts, permissions, and profiles.</p>`
+                },
+                'Subscriptions': {
+                    title: 'Subscriptions',
+                    content: `<h3>Manage Subscriptions</h3>
+                              <p>Manage all active and expired user subscriptions.</p>`
+                },
+                'Payments': {
+                    title: 'Payments',
+                    content: `<h3>View Payments</h3>
+                              <p>View payment history and manage payment gateways.</p>`
+                },
+                'System': {
+                    title: 'System Settings',
+                    content: `<h3>System Configuration</h3>
+                              <p>Configure system-wide settings and integrations.</p>`
+                },
+                'Marketing': {
+                    title: 'Marketing Campaigns',
+                    content: `<h3>Marketing & Promotions</h3>
+                              <p>Manage your marketing campaigns, newsletters, and promotions.</p>`
+                },
+                'Reports': {
+                    title: 'Reports',
+                    content: `<h3>Generate Reports</h3>
+                              <p>Access and generate various reports on sales, users, and performance.</p>`
+                },
+                'Admin Roles': {
+                    title: 'Admin Roles',
+                    content: `<h3>Manage Admin Roles</h3>
+                              <p>Create and assign roles to different administrators.</p>`
+                },
+                'Support': {
+                    title: 'Support Tickets',
+                    content: `<h3>Customer Support</h3>
+                              <p>View and respond to customer support tickets.</p>`
+                },
+                'Monitoring': {
+                    title: 'System Monitoring',
+                    content: `<h3>Monitor System Health</h3>
+                              <p>Monitor the health and performance of the application.</p>`
+                }
+            };
+
+            // Function to toggle the sidebar for mobile
+            function toggleSidebar() {
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
+                pageWrapper.classList.toggle('sidebar-active');
+            }
+
+            // Function to change the main content
+            function changeContent(pageName) {
+                const pageData = pages[pageName];
+                if (pageData) {
+                    pageTitle.textContent = pageData.title;
+                    pageContent.innerHTML = pageData.content;
+                }
+            }
+
+            // Event listener for the toggle button
+            sidebarToggle.addEventListener('click', toggleSidebar);
+
+            // Close sidebar when clicking on the overlay
+            overlay.addEventListener('click', function() {
+                if (sidebar.classList.contains('active')) {
+                    toggleSidebar();
+                }
+            });
+
+            // Add event listeners to sidebar links
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function(event) {
+                    event.preventDefault();
+
+                    // Remove active class from all links
+                    sidebarLinks.forEach(item => item.classList.remove('active'));
+                    
+                    // Add active class to the clicked link
+                    this.classList.add('active');
+
+                    // Get the data-page attribute and change content
+                    const pageName = this.getAttribute('data-page');
+                    changeContent(pageName);
+
+                    // Close sidebar on small screens after clicking a link
+                    if (window.innerWidth <= 992) {
+                        toggleSidebar();
+                    }
+                });
+            });
+            
+            // Set initial state for desktop
+            if (window.innerWidth > 992) {
+                sidebar.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

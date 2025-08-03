@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9O5SmXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl8W2NfM5KDD+ptx" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        :root {
+            --primary-color: #0d7878;
+            --primary-dark: #065e5e;
+            --primary-light: #16a6a6;
+            --secondary-color: #2C3E50;
+            --accent-color: #08821c;
+            --success-color: #27AE60;
+            --warning-color: #F39C12;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f6; /* Light gray background */
+        }
+        .sidebar {
+            width: 260px;
+            background-color: var(--primary-color); /* Use primary color */
+            color: #e2e8f0; /* Light gray text */
+        }
+        .main-content {
+            flex-grow: 1;
+            padding: 2rem;
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 0.75rem; /* Rounded corners */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .content-wrapper {
+            flex-grow: 1; /* Baqi jagah leta hai */
+            display: flex; /* Iske children ke liye flexbox enable karein */
+            flex-direction: column; /* Header ko content ke upar stack karein */
+        }
+
+        /* Header ke khaas styles */
+        .app-header {
+            padding: 2rem; /* Content ke sath consistent padding */
+            background-color: #f4f7f6; /* Body background se match karein */
+            border-bottom: 1px solid #e2e8f0; /* Halka sa separator */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Main invoice content aur right sidebar ke liye container */
+        .invoice-and-settings-container {
+            display: flex; /* Children ko horizontally arrange karein */
+            flex-grow: 1; /* Baqi vertical space lein */
+            padding: 0 2rem 2rem 2rem; /* Top padding header se handle hoti hai, baqi yahan */
+            overflow-y: auto; /* Is section ke liye scrolling allow karein */
+        }
+
+        /* Main Content Area for Projects */
+        .main-content-area { /* Naya naam diya gaya hai taaki confusion na ho */
+            flex-grow: 1; /* Apne parent ke andar available space leta hai */
+            margin-right: 2rem; /* Main content aur right sidebar ke darmiyan space */
+            /* Ab ismein invoice-creator-app ka content hoga */
+        }
+
+        /* Right Settings Sidebar */
+        .right-settings-sidebar {
+            width: 300px; /* Right sidebar ke liye fixed width, zarurat ke mutabiq adjust karein */
+            flex-shrink: 0; /* Sidebar ko shrink hone se rokein */
+            display: flex; /* Flex container banaya taaki buttons neeche align ho sakein */
+            flex-direction: column; /* Items ko column mein stack karein */
+            justify-content: space-between; /* Content aur buttons ko alag alag end par align karein */
+        }
+        .right-settings-sidebar .card {
+            width: 100%; /* Card ko sidebar ki width fill karne ke liye */
+            margin-bottom: 1.5rem; /* Card aur buttons ke beech space */
+        }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .nav-link:hover {
+            background-color: var(--primary-dark); /* Darker primary on hover */
+        }
+        .nav-link.active {
+            background-color: var(--primary-light); /* Lighter primary for active link */
+            font-weight: 600;
+        }
+        .tab-content {
+            display: block; /* Default to block, will be hidden/shown by new JS */
+        }
+        /* Initially hide all tab contents except the dashboard, which will be shown by default */
+        #leads, #customers, #tasks, #analytics {
+            display: none;
+        }
+        .logout-btn {
+            padding: 10px 20px;
+            border-radius: 25px; /* Rounded button */
+            font-weight: 500;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px; /* Space between icon and text */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Subtle shadow */
+            transition: all 0.3s ease;
+
+            /* Apply new colors */
+            background-color: var(--primary-color);
+            color: white; /* Ensure text is readable */
+            border-color: var(--primary-color); /* Match border color */
+        }
+        .logout-btn:hover {
+            transform: translateY(-2px); /* Slight lift on hover */
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+            background-color: var(--primary-dark); /* Darker shade on hover */
+            border-color: var(--primary-dark);
+        }
+        .logout-btn .fa-sign-out-alt {
+            font-size: 1.2em; /* Slightly larger icon */
+        }
+        .client-assign-area {
+            border: 2px dashed #ced4da;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            text-align: center;
+            color: #6c757d; /* text-muted */
+            background-color: #f8f9fa; /* light background */
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            height: 100%; /* Ensure it takes full height of its column */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+         /* New Project Form Specific Styles */
+        .project-form-card {
+            border: 1px solid #e2e8f0;
+            padding: 2rem;
+        }
+        .client-assign-area:hover {
+            background-color: #e9ecef;
+            border-color: #adb5bd;
+        }
+        .client-assign-area i {
+            font-size: 2.5rem; /* Larger icon */
+            margin-bottom: 0.5rem;
+            color: #adb5bd;
+        }
+        .team-members-section .member-initials {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            color: white;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+        .team-members-section .add-member-btn {
+            background-color: #e2e8f0;
+            color: #6c757d;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            border: none;
+            cursor: pointer;
+        }
+        .team-members-section .add-member-btn:hover {
+            background-color: #d1d9e0;
+        }
+        .project-settings-list .list-group-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .project-settings-list .list-group-item:last-child {
+            border-bottom: none;
+        }
+        .project-settings-list .list-group-item h6 {
+            margin-bottom: 0.25rem;
+        }
+        .project-settings-list .list-group-item small {
+            color: #6c757d;
+        }
+        .project-settings-list .list-group-item i.bi-chevron-right {
+            font-size: 1rem;
+            color: #6c757d;
+        }
+        .project-settings-list .list-group-item:hover {
+            background-color: #f8f9fa;
+        }
+        .project-settings-list .list-group-item .value-text {
+            color: #343a40; /* Darker text for values */
+            font-weight: 500;
+        }
+        .service-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .service-item input {
+            flex-grow: 1;
+            margin-right: 0.5rem;
+        }
+        .service-item .remove-service-btn {
+            background: none;
+            border: none;
+            color: #dc3545;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="flex min-h-screen">
+
+    <!-- Sidebar -->
+    <aside class="sidebar flex flex-col p-6">
+        <div class="text-white mb-8">
+            <div class="flex items-center justify-between text-xl font-bold mb-1">
+                <span>Yusi Technologies, Inc.</span>
+                <!-- Dropdown arrow icon (similar to screenshot) -->
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+            <div class="text-sm text-gray-300">Owner</div>
+        </div>
+        <nav class="flex-grow">
+            <ul>
+                <li class="mb-2">
+                    <a href="dashboard.html" class="nav-link">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 001 1h3m-6-10v10a1 1 0 001 1h3"></path></svg>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="new_invoice.html" class="nav-link">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                        Invoices
+                        <svg class="w-4 h-4 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="quotes.html" class="nav-link">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                        Quotes 
+                    </a>
+                </li>
+                     <li class="mb-2">
+                    <a href="#" class="nav-link">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                        Payments
+                        <svg class="w-4 h-4 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="new_client.html" class="nav-link">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H2v-2a3 3 0 015.356-1.857M17 20v-2c0-.134-.01-.265-.029-.395M18.42 15.653A9.985 9.985 0 0118 12c0-4.418-3.582-8-8-8s-8 3.582-8 8c0 1.02.21 1.99.605 2.894M12 10a2 2 0 110-4 2 2 0 010 4zm7.657-2.343A7.98 7.98 0 0121 12c0 4.418-3.582 8-8 8"></path></svg>
+                        Clients
+                    </a>
+                </li>
+           
+                <li class="mb-2">
+                    <a href="expenses.html" class="nav-link">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                        Expenses
+                        <svg class="w-4 h-4 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="project.html" class="nav-link active">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                        Projects
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="time_management.html" class="nav-link">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Time Management
+ 
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="#" class="nav-link">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H2v-2a3 3 0 015.356-1.857M17 20v-2c0-.134-.01-.265-.029-.395M18.42 15.653A9.985 9.985 0 0118 12c0-4.418-3.582-8-8-8s-8 3.582-8 8c0 1.02.21 1.99.605 2.894M12 10a2 2 0 110-4 2 2 0 010 4zm7.657-2.343A7.98 7.98 0 0121 12c0 4.418-3.582 8-8 8"></path></svg>
+                        Payroll
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="#" class="nav-link">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        Accounting
+                        <svg class="w-4 h-4 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="#" class="nav-link">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                        Analytics & Reports
+ 
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="settings.html" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-3">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                    </svg>
+                        Settings
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="#" class="nav-link">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                        Logout
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <header class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">Projects</h1>
+            <div class="flex items-center space-x-4">
+                <input type="text" placeholder="Search..." class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button type="button" class="btn logout-btn"><i class="fas fa-sign-out-alt"></i>Logout</button>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <!-- Container for Main Content and Right Settings Sidebar -->
+        <div class="invoice-and-settings-container">
+            <!-- Main Content Area for Projects -->
+            <main class="main-content-area">
+                <div class="card shadow-sm mb-4 project-form-card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-7">
+                                <div class="mb-4 team-members-section">
+                                    <label class="form-label text-muted">Team Members</label>
+                                    <div class="d-flex align-items-center">
+                                        <span class="member-initials">MS</span>
+                                        <button class="add-member-btn">+</button>
+                                        <span class="ms-2 text-primary">Invite your team</span>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <input type="text" class="form-control rounded" id="projectName" placeholder="Enter a project name">
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control rounded" id="projectDescription" placeholder="Add a description (optional)">
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="startDate" class="form-label text-muted">Start Date</label>
+                                        <input type="date" class="form-control rounded" id="startDate">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="endDate" class="form-label text-muted">End Date</label>
+                                        <input type="date" class="form-control rounded" id="endDate">
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="totalHours" class="form-label text-muted">Total Hours</label>
+                                    <input type="text" class="form-control rounded" id="totalHours" value="0h 00m" readonly>
+                                </div>
+                                <h5 class="mt-4">SERVICES</h5>
+                                <div id="servicesContainer" class="mb-4">
+                                    <!-- Service items will be added here by JavaScript -->
+                                </div>
+                                <button class="btn btn-outline-secondary btn-sm mb-4 rounded" id="addServiceBtn">+ Add a Service</button>
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label text-muted">Client</label>
+                                <div class="client-assign-area d-flex flex-column justify-content-center align-items-center">
+                                    <i class="bi bi-person-plus"></i>
+                                    <p class="mb-0">+ Assign a Client</p>
+                                    <p class="mb-0 text-muted text-sm mt-2">Choose who you're billing the project to</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Right Settings Sidebar -->
+            <aside class="right-settings-sidebar">
+                <div class="card shadow-sm rounded">
+                    <div class="card-header bg-white">
+                        <h6 class="mb-0 text-secondary">Settings</h6>
+                        <small class="text-muted">For This Project</small>
+                    </div>
+                    <ul class="list-group list-group-flush project-settings-list">
+                        <li class="list-group-item d-flex justify-content-between align-items-center rounded-top">
+                            <div>
+                                <h6 class="mb-0">Project Type</h6>
+                                <small class="text-muted">Hourly Project</small>
+                            </div>
+                            <a href="#" class="text-muted rounded"><i class="bi bi-chevron-right"></i></a>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">Estimate Type</h6>
+                                <small class="text-muted">Total Hours</small>
+                            </div>
+                            <a href="#" class="text-muted rounded"><i class="bi bi-chevron-right"></i></a>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">Set Billable Rates</h6>
+                                <small class="text-muted">Single Hourly Rate: $0.00</small>
+                            </div>
+                            <a href="#" class="text-muted rounded"><i class="bi bi-chevron-right"></i></a>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">Set Cost Rates</h6>
+                                <small class="text-muted">How much you pay your team members for the work they do</small>
+                            </div>
+                            <a href="#" class="text-muted rounded"><i class="bi bi-chevron-right"></i></a>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center rounded-bottom">
+                            <div>
+                                <h6 class="mb-0">Set Expense Markup</h6>
+                                <small class="text-muted">Markup: 0%</small>
+                            </div>
+                            <a href="#" class="text-muted rounded"><i class="bi bi-chevron-right"></i></a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Cancel and Save buttons here -->
+                <div class="d-flex justify-content-end space-x-4 mt-auto py-3">
+                    <button class="btn btn-link text-secondary rounded">Cancel</button>
+                    <button class="btn btn-success rounded">Save</button>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+        <!-- Leads Content -->
+        <section id="leads" class="tab-content">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Leads Management</h2>
+            <div class="card p-6">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
+                            <th scope="col" class="relative px-6 py-3"><span class="sr-only">Edit</span></th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Alice Johnson</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">alice@example.com</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">New</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Website</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <a href="#" class="text-blue-600 hover:text-blue-900">Edit</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Bob Williams</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">bob@example.com</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Contacted</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Referral</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <a href="#" class="text-blue-600 hover:text-blue-900">Edit</a>
+                            </td>
+                        </tr>
+                        <!-- More leads rows can be added here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Customers Content -->
+        <section id="customers" class="tab-content">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Customers List</h2>
+            <div class="card p-6">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Interaction</th>
+                            <th scope="col" class="relative px-6 py-3"><span class="sr-only">Edit</span></th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Charlie Brown</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Peanuts Inc.</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-07-15</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <a href="#" class="text-blue-600 hover:text-blue-900">View</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Diana Prince</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Justice League</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-07-10</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <a href="#" class="text-blue-600 hover:text-blue-900">View</a>
+                            </td>
+                        </tr>
+                        <!-- More customers rows can be added here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Tasks Content -->
+        <section id="tasks" class="tab-content">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Tasks List</h2>
+            <div class="card p-6">
+                <ul class="divide-y divide-gray-200">
+                    <li class="py-4 flex items-center justify-between">
+                        <div>
+                            <p class="text-lg font-semibold text-gray-900">Follow up with new lead (Sarah Connor)</p>
+                            <p class="text-sm text-gray-500">Due: 2025-07-19</p>
+                        </div>
+                        <button class="bg-green-500 text-white px-3 py-1 rounded-md text-sm hover:bg-green-600">Mark Done</button>
+                    </li>
+                    <li class="py-4 flex items-center justify-between">
+                        <div>
+                            <p class="text-lg font-semibold text-gray-900">Schedule demo for Acme Corp</p>
+                            <p class="text-sm text-gray-500">Due: 2025-07-21</p>
+                        </div>
+                        <button class="bg-green-500 text-white px-3 py-1 rounded-md text-sm hover:bg-green-600">Mark Done</button>
+                    </li>
+                    <!-- More tasks can be added here -->
+                </ul>
+            </div>
+        </section>
+
+        <!-- Analytics Content -->
+        <section id="analytics" class="tab-content">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Sales Analytics</h2>
+            <div class="card p-6">
+                <p class="text-gray-700">This section would display charts and graphs for sales performance, lead conversion rates, customer retention, etc. (Requires a charting library or custom SVG/Canvas drawing).</p>
+                <div class="mt-4 bg-gray-100 h-64 flex items-center justify-center rounded-md text-gray-500">
+                    Placeholder for Sales Chart
+                </div>
+                <div class="mt-6 bg-gray-100 h-64 flex items-center justify-center rounded-md text-gray-500">
+                    Placeholder for Lead Conversion Chart
+                </div>
+            </div>
+        </section>
+
+    </main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eE7q8dE8B" crossorigin="anonymous"></script>
+    <!-- Removed the previous JavaScript for tab switching -->
+    <!-- Bootstrap JS (bundle includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set default date for start and end dates
+            const today = new Date();
+            const formatDate = (date) => {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
+            document.getElementById('startDate').value = formatDate(today);
+            document.getElementById('endDate').value = formatDate(today); // You can adjust this for a default end date
+
+            // Add Service functionality
+            const servicesContainer = document.getElementById('servicesContainer');
+            const addServiceBtn = document.getElementById('addServiceBtn');
+
+            function addServiceItem() {
+                const newServiceItem = document.createElement('div');
+                newServiceItem.classList.add('service-item');
+                newServiceItem.innerHTML = `
+                    <input type="text" class="form-control rounded" placeholder="Service Name">
+                    <button class="remove-service-btn">&times;</button>
+                `;
+                servicesContainer.appendChild(newServiceItem);
+
+                // Attach event listener to the new remove button
+                newServiceItem.querySelector('.remove-service-btn').addEventListener('click', function() {
+                    newServiceItem.remove();
+                });
+            }
+
+            // Event listener for "Add a Service" button
+            addServiceBtn.addEventListener('click', addServiceItem);
+
+            // Initial add a service item if needed (optional)
+            // addServiceItem();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter -->
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+     
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9O5SmXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl8W2NfM5KDD+ptx" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        :root {
+            --primary-color: #0d7878;
+            --primary-dark: #065e5e;
+            --primary-light: #16a6a6;
+            --secondary-color: #2C3E50;
+            --accent-color: #08821c;
+            --success-color: #27AE60;
+            --warning-color: #F39C12;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f6; /* Light gray background */
+        }
+        .sidebar {
+            width: 400px;
+            background-color: var(--primary-color); /* Use primary color */
+            color: #e2e8f0; /* Light gray text */
+        }
+        .main-content {
+            flex-grow: 1;
+            padding: 2rem;
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 0.75rem; /* Rounded corners */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .nav-link:hover {
+            background-color: var(--primary-dark); /* Darker primary on hover */
+        }
+        .nav-link.active {
+            background-color: var(--primary-light); /* Lighter primary for active link */
+            font-weight: 600;
+        }
+        .tab-content {
+            display: block; /* Default to block, will be hidden/shown by new JS */
+        }
+        /* Initially hide all tab contents except the dashboard, which will be shown by default */
+        #leads, #customers, #tasks, #analytics {
+            display: none;
+        }
+        .logout-btn {
+            padding: 10px 20px;
+            border-radius: 25px; /* Rounded button */
+            font-weight: 500;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px; /* Space between icon and text */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Subtle shadow */
+            transition: all 0.3s ease;
+
+            /* Apply new colors */
+            background-color: var(--primary-color);
+            color: white; /* Ensure text is readable */
+            border-color: var(--primary-color); /* Match border color */
+        }
+        .logout-btn:hover {
+            transform: translateY(-2px); /* Slight lift on hover */
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+            background-color: var(--primary-dark); /* Darker shade on hover */
+            border-color: var(--primary-dark);
+        }
+        .logout-btn .fa-sign-out-alt {
+            font-size: 1.2em; /* Slightly larger icon */
+        }
+        /* Time Management Specific Styles */
+        .info-card {
+            background-color: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 1;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .info-card .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #adb5bd;
+            cursor: pointer;
+        }
+        .info-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            flex: 1;
+            padding: 0 1rem;
+        }
+        .info-section i {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        .info-section .learn-more {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .info-section .learn-more:hover {
+            text-decoration: underline;
+        }
+
+        .time-tracking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .time-tracking-nav .nav-link {
+            color: #6c757d;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            margin-right: 0.5rem;
+        }
+        .time-tracking-nav .nav-link.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        .time-tracking-nav .nav-link:hover:not(.active) {
+            background-color: #e9ecef;
+        }
+        .time-tracking-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 0.5rem;
+            overflow: hidden; /* For rounded corners on table */
+        }
+        .time-tracking-table th, .time-tracking-table td {
+            padding: 0.75rem;
+            vertical-align: middle;
+            border-top: 1px solid #dee2e6;
+        }
+        .time-tracking-table th {
+            background-color: #f8f9fa;
+            text-align: left;
+            font-weight: 600;
+            color: #343a40;
+        }
+        .time-tracking-table tbody tr:first-child td {
+            border-top: none;
+        }
+        .time-tracking-table .total-row td {
+            font-weight: bold;
+            background-color: #e9ecef;
+        }
+        .time-tracking-table .member-initials {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            color: white;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+        .time-tracking-table .action-icons i {
+            cursor: pointer;
+            margin-left: 0.75rem;
+            color: #6c757d;
+        }
+        .time-tracking-table .action-icons i:hover {
+            color: var(--primary-color);
+        }
+         /* Right Settings Sidebar */
+        .right-settings-sidebar {
+            width: 300px; /* Right sidebar ke liye fixed width, zarurat ke mutabiq adjust karein */
+            flex-shrink: 0; /* Sidebar ko shrink hone se rokein */
+            display: flex; /* Flex container banaya taaki buttons neeche align ho sakein */
+            flex-direction: column; /* Items ko column mein stack karein */
+            justify-content: space-between; /* Content aur buttons ko alag alag end par align karein */
+            margin-left: 20px;
+        }
+        .right-settings-sidebar .card {
+            width: 100%; /* Card ko sidebar ki width fill karne ke liye */
+            margin-bottom: 1.5rem; /* Card aur buttons ke beech space */
+        }
+         /* Main invoice content aur right sidebar ke liye container */
+        .invoice-and-settings-container {
+            display: flex; /* Children ko horizontally arrange karein */
+            flex-grow: 1; /* Baqi vertical space lein */
+            padding: 0 2rem 2rem 2rem; /* Top padding header se handle hoti hai, baqi yahan */
+            overflow-y: auto; /* Is section ke liye scrolling allow karein */
+        }
+    </style>
+</head>
+<body class="flex min-h-screen">
+
+    <!-- Sidebar -->
+    <aside class="sidebar flex flex-col p-6">
+        <div class="text-white mb-8">
+            <div class="flex items-center justify-between text-xl font-bold mb-1">
+                <span>Yusi Technologies, Inc.</span>
+                <!-- Dropdown arrow icon (similar to screenshot) -->
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+            <div class="text-sm text-gray-300">Owner</div>
+        </div>
+        <nav class="flex-grow">
+            <ul>
+                <li class="mb-2">
+                    <a href="dashboard.html" class="nav-link">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 001 1h3m-6-10v10a1 1 0 001 1h3"></path></svg>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="new_invoice.html" class="nav-link">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                        Invoices
+                        <svg class="w-4 h-4 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="quotes.html" class="nav-link">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                        Quotes 
+                    </a>
+                </li>
+                     <li class="mb-2">
+                    <a href="#" class="nav-link">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                        Payments
+                        <svg class="w-4 h-4 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="new_client.html" class="nav-link">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H2v-2a3 3 0 015.356-1.857M17 20v-2c0-.134-.01-.265-.029-.395M18.42 15.653A9.985 9.985 0 0118 12c0-4.418-3.582-8-8-8s-8 3.582-8 8c0 1.02.21 1.99.605 2.894M12 10a2 2 0 110-4 2 2 0 010 4zm7.657-2.343A7.98 7.98 0 0121 12c0 4.418-3.582 8-8 8"></path></svg>
+                        Clients
+                    </a>
+                </li>
+           
+                <li class="mb-2">
+                    <a href="expenses.html" class="nav-link">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                        Expenses
+                        <svg class="w-4 h-4 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="project.html" class="nav-link">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                        Projects
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="time_management.html" class="nav-link active">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Time Management
+ 
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="#" class="nav-link">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H2v-2a3 3 0 015.356-1.857M17 20v-2c0-.134-.01-.265-.029-.395M18.42 15.653A9.985 9.985 0 0118 12c0-4.418-3.582-8-8-8s-8 3.582-8 8c0 1.02.21 1.99.605 2.894M12 10a2 2 0 110-4 2 2 0 010 4zm7.657-2.343A7.98 7.98 0 0121 12c0 4.418-3.582 8-8 8"></path></svg>
+                        Payroll
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="#" class="nav-link">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        Accounting
+                        <svg class="w-4 h-4 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="#" class="nav-link">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                        Analytics & Reports
+ 
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="settings.html" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-3">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                    </svg>
+                        Settings
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="#" class="nav-link">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                        Logout
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <header class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">Time Management</h1>
+            <div class="flex items-center space-x-4">
+                <input type="text" placeholder="Search..." class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button type="button" class="btn logout-btn"><i class="fas fa-sign-out-alt"></i>Logout</button>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+         <!-- Container for Main Content and Right Settings Sidebar -->
+        <div class="invoice-and-settings-container">
+            <!-- Main Content Area for Time Management -->
+            <main class="main-content-area">
+                <!-- "Track Time and Never Lose Another Billable Minute" Section -->
+                <div class="info-card">
+                    <div class="d-flex flex-grow-1 justify-content-around">
+                        <div class="info-section">
+                            <i class="bi bi-alarm"></i>
+                            <h6 class="mb-1">Get Paid for All Your Time</h6>
+                            <p class="text-muted text-sm mb-0">You can track time with the timer, or by logging time manually. <a href="#" class="learn-more">Learn More</a></p>
+                        </div>
+                        <div class="info-section">
+                            <i class="bi bi-file-earmark-text"></i>
+                            <h6 class="mb-1">Convert Time into Invoices</h6>
+                            <p class="text-muted text-sm mb-0">Accurately bill your clients for the time you've worked. <a href="#" class="learn-more">Learn More</a></p>
+                        </div>
+                        <div class="info-section">
+                            <i class="bi bi-people"></i>
+                            <h6 class="mb-1">Track Everything for Everyone</h6>
+                            <p class="text-muted text-sm mb-0">Don't miss a billable moment by staying on top of billable hours. <a href="#" class="learn-more">Learn More</a></p>
+                        </div>
+                    </div>
+                    <button class="close-btn">&times;</button>
+                </div>
+
+                <!-- "Run Payroll Effortlessly" Section -->
+                <div class="info-card">
+                    <div class="d-flex align-items-center flex-grow-1">
+                        <i class="bi bi-currency-dollar me-3" style="font-size: 2.5rem; color: #F39C12;"></i>
+                        <div>
+                            <h6 class="mb-1">Run Payroll Effortlessly</h6>
+                            <p class="text-muted text-sm mb-0">Track time and pay your employees directly from your account with <a href="#" class="learn-more">FreshBooks Payroll</a>.</p>
+                        </div>
+                    </div>
+                    <button class="close-btn">&times;</button>
+                </div>
+
+                <!-- Time Tracking Section -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <div class="time-tracking-header">
+                            <h5 class="mb-0">Time Tracking</h5>
+                            <div class="d-flex align-items-center">
+                                <div class="dropdown me-3">
+                                    <button class="btn btn-outline-secondary dropdown-toggle rounded" type="button" id="moreActionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                        More Actions
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="moreActionsDropdown">
+                                        <li><a class="dropdown-item" href="#">Action 1</a></li>
+                                        <li><a class="dropdown-item" href="#">Action 2</a></li>
+                                    </ul>
+                                </div>
+                                <button class="btn btn-success rounded">Generate Invoice</button>
+                            </div>
+                        </div>
+
+                        <ul class="nav nav-pills mb-3 time-tracking-nav">
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="#">Day</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Week</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Month</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">All</a>
+                            </li>
+                        </ul>
+
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex align-items-center">
+                                <!-- Day Navigation -->
+                                <button class="btn btn-outline-secondary btn-sm me-2 rounded">&lt;</button>
+                                <span class="fw-bold">Sun 7</span>
+                                <button class="btn btn-outline-secondary btn-sm ms-2 rounded">&gt;</button>
+                                <span class="mx-3 text-muted">|</span>
+                                <span class="fw-bold">Mon 8</span>
+                                <span class="mx-3 text-muted">|</span>
+                                <span class="fw-bold active-day-label">Tue 9</span> <!-- Active day -->
+                                <span class="mx-3 text-muted">|</span>
+                                <span class="fw-bold">Wed 10</span>
+                                <span class="mx-3 text-muted">|</span>
+                                <span class="fw-bold">Thu 11</span>
+                                <span class="mx-3 text-muted">|</span>
+                                <span class="fw-bold">Fri 12</span>
+                                <span class="mx-3 text-muted">|</span>
+                                <span class="fw-bold">Sat 13</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="text-muted me-2">Total:</span>
+                                <span class="fw-bold">0:00</span>
+                            </div>
+                        </div>
+
+                        <table class="table time-tracking-table">
+                            <thead>
+                                <tr>
+                                    <th>Team Member / Date</th>
+                                    <th>Client / Project / Service / Note</th>
+                                    <th>Time / Status</th>
+                                    <th>Daily Total</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Example row - will be dynamically added in real app -->
+                                <tr>
+                                    <td>
+                                        <span class="member-initials me-2">MS</span>
+                                        <span class="fw-bold">M.S.</span>
+                                        <br>
+                                        <small class="text-muted">Today</small>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm rounded" placeholder="Add client, project, service or notes">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm text-end rounded" value="0:00">
+                                    </td>
+                                    <td>0:00</td>
+                                    <td class="action-icons text-end">
+                                        <i class="bi bi-play-fill"></i> <!-- Play icon for timer -->
+                                        <i class="bi bi-pencil-fill"></i> <!-- Edit icon -->
+                                        <i class="bi bi-trash-fill"></i> <!-- Delete icon -->
+                                    </td>
+                                </tr>
+                                <tr class="total-row">
+                                    <td colspan="3" class="text-end">Daily Total:</td>
+                                    <td>0:00</td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Right Settings Sidebar -->
+            <aside class="right-settings-sidebar">
+                <div class="card shadow-sm rounded">
+                    <div class="card-header bg-white">
+                        <h6 class="mb-0 text-secondary">Time Management Settings</h6>
+                        <small class="text-muted">For This Page</small>
+                    </div>
+                    <ul class="list-group list-group-flush settings-list">
+                        <li class="list-group-item d-flex justify-content-between align-items-center rounded-top">
+                            <div>
+                                <h6 class="mb-0">Track Time</h6>
+                                <small class="text-muted">Start/Stop timers for projects</small>
+                            </div>
+                            <a href="#" class="text-muted rounded"><i class="bi bi-chevron-right"></i></a>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">View Timesheets</h6>
+                                <small class="text-muted">Review team's logged hours</small>
+                            </div>
+                            <a href="#" class="text-muted rounded"><i class="bi bi-chevron-right"></i></a>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center rounded-bottom">
+                            <div>
+                                <h6 class="mb-0">Reporting Options</h6>
+                                <small class="text-muted">Generate time reports</small>
+                            </div>
+                            <a href="#" class="text-muted rounded"><i class="bi bi-chevron-right"></i></a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Buttons area (if any, will be added here based on future instructions) -->
+            </aside>
+        </div>
+    </div>
+        
+
+        <!-- Leads Content -->
+        <section id="leads" class="tab-content">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Leads Management</h2>
+            <div class="card p-6">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
+                            <th scope="col" class="relative px-6 py-3"><span class="sr-only">Edit</span></th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Alice Johnson</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">alice@example.com</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">New</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Website</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <a href="#" class="text-blue-600 hover:text-blue-900">Edit</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Bob Williams</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">bob@example.com</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Contacted</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Referral</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <a href="#" class="text-blue-600 hover:text-blue-900">Edit</a>
+                            </td>
+                        </tr>
+                        <!-- More leads rows can be added here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Customers Content -->
+        <section id="customers" class="tab-content">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Customers List</h2>
+            <div class="card p-6">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Interaction</th>
+                            <th scope="col" class="relative px-6 py-3"><span class="sr-only">Edit</span></th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Charlie Brown</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Peanuts Inc.</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-07-15</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <a href="#" class="text-blue-600 hover:text-blue-900">View</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Diana Prince</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Justice League</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-07-10</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <a href="#" class="text-blue-600 hover:text-blue-900">View</a>
+                            </td>
+                        </tr>
+                        <!-- More customers rows can be added here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Tasks Content -->
+        <section id="tasks" class="tab-content">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Tasks List</h2>
+            <div class="card p-6">
+                <ul class="divide-y divide-gray-200">
+                    <li class="py-4 flex items-center justify-between">
+                        <div>
+                            <p class="text-lg font-semibold text-gray-900">Follow up with new lead (Sarah Connor)</p>
+                            <p class="text-sm text-gray-500">Due: 2025-07-19</p>
+                        </div>
+                        <button class="bg-green-500 text-white px-3 py-1 rounded-md text-sm hover:bg-green-600">Mark Done</button>
+                    </li>
+                    <li class="py-4 flex items-center justify-between">
+                        <div>
+                            <p class="text-lg font-semibold text-gray-900">Schedule demo for Acme Corp</p>
+                            <p class="text-sm text-gray-500">Due: 2025-07-21</p>
+                        </div>
+                        <button class="bg-green-500 text-white px-3 py-1 rounded-md text-sm hover:bg-green-600">Mark Done</button>
+                    </li>
+                    <!-- More tasks can be added here -->
+                </ul>
+            </div>
+        </section>
+
+        <!-- Analytics Content -->
+        <section id="analytics" class="tab-content">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Sales Analytics</h2>
+            <div class="card p-6">
+                <p class="text-gray-700">This section would display charts and graphs for sales performance, lead conversion rates, customer retention, etc. (Requires a charting library or custom SVG/Canvas drawing).</p>
+                <div class="mt-4 bg-gray-100 h-64 flex items-center justify-center rounded-md text-gray-500">
+                    Placeholder for Sales Chart
+                </div>
+                <div class="mt-6 bg-gray-100 h-64 flex items-center justify-center rounded-md text-gray-500">
+                    Placeholder for Lead Conversion Chart
+                </div>
+            </div>
+        </section>
+
+    </main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eE7q8dE8B" crossorigin="anonymous"></script>
+    <!-- Removed the previous JavaScript for tab switching -->
+    <script>
+        // This script is now empty, ready for new functionality.
+        // The tab contents are initially hidden by CSS, except for the dashboard.
+        // You will provide the new functionality via a screenshot.
+        
+
+    </script>
+</body>
+</html>
